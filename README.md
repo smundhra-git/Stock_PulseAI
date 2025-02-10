@@ -136,7 +136,7 @@ The foundation of the AI model is high-quality, structured **financial data**. W
    - Quandl (Premium for more accurate data)  
    - Google Trends (For interest in a stock)  
 🔹 **Tasks:**  
-   -[x] Write a script to fetch historical stock prices **(1-year, 5-year, 10-year data)**  
+   -[] Write a script to fetch historical stock prices **(1-year, 5-year, 10-year data)**  
    -[ ] Store data in **PostgreSQL**  
    -[ ] Apply **data normalization & feature engineering**  
    -[ ] Run **Linear Regression & Moving Averages** as a baseline model  
