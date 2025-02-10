@@ -1,0 +1,16 @@
+# Ignore Python & Django files
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.sqlite3
+
+# Ignore environment variables
+.env
+
+# Ignore VS Code settings
+.vscode/
+
+
+# Ignore logs and cache
+*.log
