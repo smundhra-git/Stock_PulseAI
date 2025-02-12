@@ -31,10 +31,7 @@ Things to do here
             Buy: When OBV is rising with price.
             Sell: When OBV is falling with price.
             
-        8. Support and Resistance Trading
-            Support = Price level where buying occurs.
-            Resistance = Price level where selling occurs.
-        9. Donchian Channel Breakout
+        8. Donchian Channel Breakout
             Buy: When price breaks above the upper channel.
             Sell: When price breaks below the lower channel.
 

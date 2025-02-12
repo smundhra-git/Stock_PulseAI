@@ -119,3 +119,7 @@ File Structure -
 │── 📜 README.md                      # Project documentation
 │── 📜 config.yaml                     # Config settings for AI processing
 
+
+
+
+This is how api will be called - http://127.0.0.1:8000/api/stock/AAPL/technical

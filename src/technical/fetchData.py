@@ -4,20 +4,17 @@ import psycopg2
 from psycopg2 import sql
 from dotenv import load_dotenv
 import os
-from database.db_operations import *  # Import database functions
+from src.database.db_operations import *  # Import database functions
 
 def fetch_stock_data(ticker: str, interval: str = "1d"):
     """
     Fetches historical stock price data for a given ticker and stores it in PostgreSQL.
     
     Steps:
-        1. CREATE TABLE (if not exists)
-        2. Check if new data is available
-        3. If no data exists, get all data
-        4. If some data exists, get data from the last available date onwards
+        1. Check if new data is available
+        2. If no data exists, get all data
+        3. If some data exists, get data from the last available date onwards
     """
-
-    create_stock_table(ticker)
 
     last_date = get_last_date(ticker)
 

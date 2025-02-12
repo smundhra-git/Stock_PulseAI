@@ -2,11 +2,12 @@ from dotenv import load_dotenv
 import os
 import psycopg2
 from psycopg2 import sql
+import pandas as pd
 
 #load dotenv
 load_dotenv()
 
-# ✅ Database connection parameters
+# Database connection parameters
 DB_CONFIG = {
     "dbname": os.getenv("DB_NAME"),
     "user": os.getenv("DB_USER"),
@@ -62,3 +63,26 @@ def delete_stock_table(ticker: str):
     conn.commit()
     cursor.close()
     conn.close()
+
+
+def get_latest_stock_data(ticker: str, window: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query = sql.SQL("""
+        SELECT date, open, high, low, close, volume
+        FROM {} 
+        ORDER BY date DESC 
+        LIMIT %s;
+    """).format(sql.Identifier(ticker.lower()))
+
+    cursor.execute(query, (window,))
+    rows = cursor.fetchall()
+    conn.close()
+
+    df = pd.DataFrame(rows, columns=["date", "open", "high", "low", "close", "volume"])
+
+    # ✅ Ensure all columns are lowercase and have no spaces
+    df.columns = df.columns.str.strip().str.lower()
+
+    return df.sort_values(by="date")
