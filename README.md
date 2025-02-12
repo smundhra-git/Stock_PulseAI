@@ -4,22 +4,7 @@
 ### **🚀 AI-Powered Financial Market Analysis Development Plan**  
 
 ## **📌 Step 1: Data Collection & Preprocessing**
-The foundation of the AI model is high-quality, structured **financial data**. We will split this into three key areas:
-
-### **1️⃣ Collect Stock Price Data (Historical & Live)**
-🔹 **Goal:** Fetch stock market data and preprocess it for AI models.  
-🔹 **Data Sources:**  
-   - Yahoo Finance API  
-   - Alpha Vantage API  
-   - Quandl (Premium for more accurate data)  
-   - Google Trends (For interest in a stock)  
-🔹 **Tasks:**  
-   -[x] Write a script to fetch historical stock prices **(1-year, 5-year, 10-year data)**  
-   -[ ] Store data in **PostgreSQL**  
-   -[ ] Apply **data normalization & feature engineering**  
-   -[ ] Run **Linear Regression & Moving Averages** as a baseline model  
-   -[ ] Train ML models **(LSTM, XGBoost, Random Forests)** for **1-day, 1-month, 1-year** price forecasting  
-   -[ ] **Validate model accuracy**  
+Technical Analsysis of a stock based on 9 factors assigning a score from -9 to 9.
 
 ---
 
@@ -105,3 +90,5 @@ Finally, we will **deploy the project**.
 -[ ] **Frontend:** Vercel (for React), CloudFront  
 -[ ] **Model Serving:** AWS Lambda or FastAPI with GPU on Google Cloud  
 -[ ] **CI/CD:** GitHub Actions + Docker  
+
+uvicorn fastapi_service.main:app --reload
