@@ -1,0 +1,64 @@
+from dotenv import load_dotenv
+import os
+import psycopg2
+from psycopg2 import sql
+
+#load dotenv
+load_dotenv()
+
+# ✅ Database connection parameters
+DB_CONFIG = {
+    "dbname": os.getenv("DB_NAME"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "host": os.getenv("DB_HOST"),
+    "port": os.getenv("DB_PORT"),
+}
+
+def get_db_connection():
+    """Establishes and returns a PostgreSQL database connection."""
+    return psycopg2.connect(**DB_CONFIG)
+
+def get_last_date(ticker: str):
+    """
+    Returns the latest date available in the table for the given ticker.
+    If no data exists, returns None.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = sql.SQL("SELECT MAX(date) FROM {}").format(sql.Identifier(ticker.lower()))
+    cursor.execute(query)
+    result = cursor.fetchone()[0]
+    cursor.close()
+    conn.close()
+    return result
+
+#create stock table, this will be the schema
+def create_stock_table(ticker: str):
+    """Creates a stock-specific table with all required technical indicators if it doesn't exist."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = sql.SQL("""
+        CREATE TABLE IF NOT EXISTS {} (
+            date DATE PRIMARY KEY,
+            open FLOAT,
+            high FLOAT,
+            low FLOAT,
+            close FLOAT,
+            volume BIGINT
+        );
+    """).format(sql.Identifier(ticker.lower()))
+    cursor.execute(query)
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+#delete stock data
+def delete_stock_table(ticker: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = sql.SQL("DROP TABLE {ticker}").format(sql.Identifier(ticker.lower()))
+    cursor.execute(query)
+    conn.commit()
+    cursor.close()
+    conn.close()
