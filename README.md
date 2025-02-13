@@ -92,3 +92,8 @@ Finally, we will **deploy the project**.
 -[ ] **CI/CD:** GitHub Actions + Docker  
 
 uvicorn fastapi_service.main:app --reload
+
+READ - https://github.com/alisonmitchell/Stock-Prediction
+https://github.com/Shikhar1998/Stock-Market-Prediction-using-Neural-Networks-and-Genetic-Algorithm
+https://github.com/JordiCorbilla/stock-prediction-deep-neural-learning
+

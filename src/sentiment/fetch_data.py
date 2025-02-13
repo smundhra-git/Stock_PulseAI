@@ -15,6 +15,9 @@ import certifi
 import datetime
 import urllib
 from database.db_operations import *
+import requests
+from datetime import datetime
+from dateutil.parser import parse  # Requires the python-dateutil package
 
 # Load environment variables from .env
 load_dotenv()
@@ -30,6 +33,7 @@ def fetch_financial_news(query, count=20, from_date=None):
     """
     Collects financial news articles using NewsAPI.
     If from_date is provided, only articles published on or after that date are fetched.
+    The returned articles are sorted by their published date (most recent first).
     """
     url = "https://newsapi.org/v2/everything"
     params = {
@@ -39,11 +43,10 @@ def fetch_financial_news(query, count=20, from_date=None):
         "language": "en"
     }
     if from_date:
-        # NewsAPI expects the 'from' parameter in YYYY-MM-DD format.
         params["from"] = from_date.strftime("%Y-%m-%d")
     try:
         response = requests.get(url, params=params)
-        response.raise_for_status()  # Raise an error for bad status codes
+        response.raise_for_status()
         data = response.json()
         articles = data.get('articles', [])
         news_articles = []
@@ -54,11 +57,15 @@ def fetch_financial_news(query, count=20, from_date=None):
                 'content': article.get('content') or article.get('description', ''),
                 'publishedAt': article.get('publishedAt', None)
             })
+        # Sort articles by publishedAt date (most recent first)
+        news_articles.sort(
+            key=lambda x: parse(x['publishedAt']) if x['publishedAt'] else datetime.min,
+            reverse=True
+        )
         return news_articles
     except Exception as e:
         print("Error fetching news:", e)
         return []
-
 # Further documentation - https://github.com/JustAnotherArchivist/snscrape/blob/master/snscrape/modules/twitter.py
 def fetch_tweets(query, max_tweets=50, from_date=None):
     """
@@ -152,3 +159,10 @@ def main():
     insert_reddit_data(ticker, reddit_posts)
 
 
+
+
+"""
+Next Idea -> Fetch Data
+-> Store them in the database
+-> Analysis will get data from database directly?
+"""
