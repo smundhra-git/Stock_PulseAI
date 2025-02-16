@@ -1,24 +1,24 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_service.routes import router  # Your routes
+from fastapi_service.routes import router  # Import your routes
 
 app = FastAPI(title="Stock Analysis API", version="1.0")
 
-# Configure CORS
+# Define allowed frontend origins
 origins = [
-    "http://localhost:3000",  # React app's origin
-    # Add any other origins if needed, e.g. production domain
+    "http://localhost:3000",  # React frontend
 ]
 
+# Enable CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins,  # Allow frontend access
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
 )
 
-# Register API routes with prefix /api
+# Register API routes
 app.include_router(router, prefix="/api")
 
 @app.get("/")

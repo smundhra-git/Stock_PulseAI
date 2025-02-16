@@ -2,6 +2,11 @@ from fastapi import APIRouter, HTTPException, Query
 from src.api_handler import *
 from fastapi.responses import JSONResponse
 import json
+from fastapi import FastAPI, Depends
+from pydantic import BaseModel
+from src.database.db_operations import signup_user, verify_token, create_access_token
+
+
 router = APIRouter()
 
 
@@ -50,3 +55,49 @@ async def get_candlestick(ticker: str,
         return JSONResponse(content=fig_json)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+
+# User models
+class UserSignup(BaseModel):
+    username: str
+    password: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+@router.post("/signup")
+async def register_user(user: UserSignup):
+    """
+    Registers a new user by calling the `signup_user` function from db_operations.
+    """
+    result = signup_user(user.username, user.password)
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return JSONResponse(content=result, status_code=201)
+
+
+@router.post("/login")
+async def login_user(user: UserLogin):
+    """
+    Authenticates a user and returns a JWT token.
+    Calls `authenticate_user` function from db_operations.
+    """
+    result = authenticate_user(user.username, user.password)
+    if "error" in result:
+        raise HTTPException(status_code=401, detail=result["error"])
+    return JSONResponse(content=result, status_code=200)
+
+
+@router.get("/protected")
+async def protected_route(token: str):
+    """
+    Example protected route that requires authentication.
+    Calls `verify_token` from db_operations.
+    """
+    result = verify_token(token)
+    if "error" in result:
+        raise HTTPException(status_code=401, detail=result["error"])
+    return JSONResponse(content={"message": f"Welcome {result['username']}!"}, status_code=200)
