@@ -5,31 +5,11 @@ We will use VADER (future -> build our own lexicon)
 """
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.dates as dates
-import seaborn as sns
-import seaborn as sns
-import math
-import datetime
-import re
-import yfinance as yf
-import nltk
 from datetime import date, timedelta
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-nltk.downloader.download('vader_lexicon')
-from textblob import TextBlob
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.linear_model import SGDClassifier
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import scale
-from sentiment.fetch_data import *
+from src.sentiment.fetch_data import *
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from sentiment.process import *
+from src.sentiment.process import *
 
 # https://www.geeksforgeeks.org/python-sentiment-analysis-using-vader/
 def analyze_sentiment_vader(articles: pd.DataFrame) -> pd.DataFrame:
@@ -53,9 +33,9 @@ def analyze_sentiment_vader(articles: pd.DataFrame) -> pd.DataFrame:
 
     # Classify sentiment based on compound score
     def classify_sentiment(compound):
-        if compound >= 0.05:
+        if compound >= 0.2:
             return "bullish"
-        elif compound <= -0.05:
+        elif compound <= -0.2:
             return "bearish"
         else:
             return "neutral"
@@ -71,13 +51,18 @@ def main():
     # Convert list of dictionaries to a DataFrame
     articles_df = pd.DataFrame(news_articles)
     
-    # If desired, you can sort the DataFrame by date (fetch_financial_news already sorted it)
-    # articles_df['publishedAt'] = pd.to_datetime(articles_df['publishedAt'])
-    # articles_df = articles_df.sort_values('publishedAt', ascending=False)
+    # Ensure the 'publishedAt' column is in datetime format
+    articles_df['publishedAt'] = pd.to_datetime(articles_df['publishedAt'])
+    
+    # Sort by date in descending order (latest first)
+    articles_df = articles_df.sort_values('publishedAt', ascending=False)
     
     # Analyze sentiment using VADER and classify as bullish or bearish
     articles_df = analyze_sentiment_vader(articles_df)
     
+    # Count the number of bullish, bearish, and neutral articles
+    print(articles_df['sentiment_class'].value_counts())
+
     # Display the first few rows
     print(articles_df.head())
 

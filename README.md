@@ -97,3 +97,6 @@ READ - https://github.com/alisonmitchell/Stock-Prediction
 https://github.com/Shikhar1998/Stock-Market-Prediction-using-Neural-Networks-and-Genetic-Algorithm
 https://github.com/JordiCorbilla/stock-prediction-deep-neural-learning
 
+https://github.com/SaloniJhalani/Stock-Market-Live-Sentiment
+
+https://finviz.com/

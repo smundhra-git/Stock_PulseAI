@@ -1,0 +1,101 @@
+/* Ensure the entire page/container uses full viewport */
+html, body, #root {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Main container as a flex column spanning the full viewport height */
+  .technical-analysis {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #fff;
+  }
+  
+  /* Analysis section at the top */
+  .analysis-section {
+    padding: 20px;
+    background-color: #f2f2f2;
+  }
+  
+  .analysis-section h2 {
+    margin: 0 0 10px 0;
+    font-size: 2rem;
+    color: #333;
+  }
+  
+  /* Graph container displays two charts side by side */
+  .graph-container {
+    flex: 1;
+    display: flex;
+    position: relative;
+  }
+  
+  /* Each chart section takes 50% of width and full height */
+  .graph-section {
+    flex: 1;
+    display: flex;            /* Make each section a flex container */
+    flex-direction: column;   /* Stack the interval selector on top, chart below */
+    border-left: 1px solid #ddd;
+  }
+  
+  /* Interval selector row at the top of each chart section */
+  .interval-selector {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #fafafa;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  /* The chart container that fills the remainder of the section below the selector */
+  .chart-area {
+    flex: 1;               /* fill remaining vertical space */
+    position: relative;
+  }
+  
+  /* Buttons for period selection (e.g., 1D, 5D, etc.) */
+  .interval-button {
+    border: none;
+    background: none;
+    padding: 6px 12px;
+    margin-right: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #555;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .interval-button:hover {
+    background-color: #e6e6e6;
+  }
+  
+  .interval-button.active {
+    background-color: #e6e6e6;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  /* Dropdown for interval selection (e.g., 1min, 5min, etc.) */
+  .interval-dropdown {
+    margin-left: auto; /* push to the right side */
+    padding: 6px;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+  }
+  
+  /* Plotly chart container - fill the .chart-area */
+  .chart-area > div {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+  }
+  

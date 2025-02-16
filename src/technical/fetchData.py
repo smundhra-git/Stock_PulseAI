@@ -7,15 +7,6 @@ import os
 from src.database.db_operations import *  # Import database functions
 
 def fetch_stock_data(ticker: str, interval: str = "1d"):
-    """
-    Fetches historical stock price data for a given ticker and stores it in PostgreSQL.
-    
-    Steps:
-        1. Check if new data is available
-        2. If no data exists, get all data
-        3. If some data exists, get data from the last available date onwards
-    """
-
     last_date = get_last_date(ticker)
 
     if last_date is None:
@@ -30,18 +21,30 @@ def fetch_stock_data(ticker: str, interval: str = "1d"):
 
     data.reset_index(inplace=True)
 
-    # Flatten MultiIndex if it exists
+    # Debug: print original columns
+    print("Original columns:", data.columns.tolist())
+
+    # If the columns are a MultiIndex, flatten them; otherwise, convert to lowercase
     if isinstance(data.columns, pd.MultiIndex):
-        data.columns = [col[0].lower() if col[1] == '' else f"{col[0].lower()}_{col[1].lower()}" for col in data.columns]
+        data.columns = [
+            col[0].lower() if col[1] == "" else f"{col[0].lower()}_{col[1].lower()}"
+            for col in data.columns
+        ]
+    else:
+        data.columns = [col.lower() for col in data.columns]
 
-    # Rename "date_" to "date" if necessary
-    if 'date_' in data.columns:
-        data.rename(columns={'date_': 'date'}, inplace=True)
+    # Debug: print processed columns
+    print("Processed columns:", data.columns.tolist())
 
-    # Remove ticker suffix dynamically if present
+    # If a column is named "date_" (rare case), rename it to "date"
+    if "date_" in data.columns:
+        data.rename(columns={"date_": "date"}, inplace=True)
+
+    # Remove ticker suffix if present (e.g. "close_aapl" becomes "close")
     ticker_suffix = f"_{ticker.lower()}"
     renamed_columns = {col: col.replace(ticker_suffix, "") for col in data.columns if col.endswith(ticker_suffix)}
-    data.rename(columns=renamed_columns, inplace=True)
+    if renamed_columns:
+        data.rename(columns=renamed_columns, inplace=True)
 
     # Ensure required columns exist
     required_columns = ["date", "close", "high", "low", "open", "volume"]
@@ -49,27 +52,26 @@ def fetch_stock_data(ticker: str, interval: str = "1d"):
     if missing_columns:
         raise KeyError(f"Missing required columns after renaming: {missing_columns}")
 
-    data["date"] = pd.to_datetime(data["date"]).dt.date  # Ensure date format
+    # Ensure date column is in the proper format
+    data["date"] = pd.to_datetime(data["date"]).dt.date
 
-    # Prepare for inserting into PostgreSQL
+    # --- Insert into PostgreSQL code ---
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    # Use psycopg2.sql for safe table name formatting
     query = sql.SQL("""
         INSERT INTO {} (date, open, high, low, close, volume)
         VALUES (%s, %s, %s, %s, %s, %s)
         ON CONFLICT (date) DO NOTHING;
-    """).format(sql.Identifier(ticker.lower()))  # Safe table formatting
+    """).format(sql.Identifier(ticker.lower()))
 
     for _, row in data.iterrows():
         values = (row["date"], row["open"], row["high"], row["low"], row["close"], row["volume"])
         try:
             cursor.execute(query, values)
         except Exception as e:
-            conn.rollback()  # Rollback on error
-            print(f"Error inserting row: {e}")  # Log the error
-            continue  # Skip to next row
+            conn.rollback()
+            print(f"Error inserting row: {e}")
+            continue
 
     conn.commit()
     cursor.close()
@@ -79,5 +81,5 @@ def fetch_stock_data(ticker: str, interval: str = "1d"):
 
 # Testing the function
 if __name__ == "__main__":
-    ticker = "AAPL"  # ✅ Use uppercase for API calls, lowercase for table naming
+    ticker = "COIN"  # ✅ Use uppercase for API calls, lowercase for table naming
     fetch_stock_data(ticker)
