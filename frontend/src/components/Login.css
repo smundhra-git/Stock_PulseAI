@@ -1,0 +1,143 @@
+  /* Login Container */
+  .login-container {
+    display: flex;
+    background: #f8f8f8;
+    width: 100vw; /* Full width */
+    height: 100vh; /* Full height */
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    background: #f8f8f8;
+  }
+  
+/* Left Side - Image */
+.login-left {
+    width: 50%;
+    height: 100vh;
+    display: flex;
+    align-items: center; /* Centers vertically */
+    justify-content: center; /* Centers horizontally */
+    background: #f3f3f3;
+    overflow: hidden;
+  }
+  
+  /* Center the Image */
+  .phones-image {
+    max-width: 70%; /* Adjust width */
+    height: auto;
+    display: block; /* Ensure it's treated as a block element */
+  }
+  
+  
+  /* Right Side - Login Form */
+  .login-right {
+    width: 50%;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: white;
+  }
+  
+  /* Logo */
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 100px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .chart-icon {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .logo-img {
+    width: 400px;
+    height: auto;
+  }
+  
+  /* Error Message */
+  .error-message {
+    color: red;
+    margin-bottom: 10px;
+  }
+
+  .success-message {
+    color: green;
+    margin-bottom: 10px;
+  }
+  
+  
+  /* Form */
+  .login-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Input Fields */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 16px;
+    outline: none;
+  }
+  
+  button {
+    width: 100%;
+    padding: 14px;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+  }
+  
+  button:hover {
+    background: #333;
+  }
+  
+  button:hover {
+    background: #333;
+  }
+  
+   /* Switch Link */
+   .switch-link {
+    background: none;
+    border: none;
+    color: #3ea6ff;
+    font-weight: bold;
+    cursor: pointer;
+    width: 60%;
+  }
+
+  /* Switch Between Login & Signup */
+.switch-container {
+    display: flex;
+    width: 100%; /* Ensure it takes full width */
+    justify-content: center; /* Center horizontally */
+    margin-top: 15px;
+
+  }
+
