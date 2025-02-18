@@ -103,11 +103,18 @@ def get_market_data_fn(market: str, period: str = "1mo"):
     
     data.set_index("date", inplace=True)
 
+    # Get a more readable title for the market
+    market_titles = {
+        "^GSPC": "S&P 500",
+        "sp500": "S&P 500"
+    }
+    market_title = market_titles.get(market, market.upper())
+
     fig = px.line(
         data_frame=data,
         x=data.index,
         y="close",
-        title=f"{market.upper()} Stock Price ({period})",
+        title=f"{market_title} Stock Price ({period})",
         labels={"x": "Date", "close": "Closing Price"},
         template="plotly_white"
     )
