@@ -1,7 +1,7 @@
 import psycopg2
 import pandas as pd
 from psycopg2 import sql
-from src.database.db_operations import *
+from src.database.stocks import *
 
 def calculate_latest_sma(df: pd.DataFrame, window: int):
     """
@@ -236,3 +236,5 @@ def calculate_score(df: pd.DataFrame):
     else:
         return "Strong Sell", score
 
+if __name__ == "__main__":
+    print(calculate_score("SMCI"))

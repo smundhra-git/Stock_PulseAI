@@ -4,7 +4,7 @@ import psycopg2
 from psycopg2 import sql
 from dotenv import load_dotenv
 import os
-from src.database.db_operations import *  # Import database functions
+from src.database.stocks import *  # Import database functions
 
 def fetch_stock_data(ticker: str, interval: str = "1d"):
     last_date = get_last_date(ticker)

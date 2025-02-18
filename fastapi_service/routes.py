@@ -4,7 +4,8 @@ from fastapi.responses import JSONResponse
 import json
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
-from src.database.db_operations import signup_user, verify_token, create_access_token
+from src.database.auth import signup_user, verify_token, authenticate_user
+import yfinance as yf
 
 
 router = APIRouter()
@@ -101,3 +102,10 @@ async def protected_route(token: str):
     if "error" in result:
         raise HTTPException(status_code=401, detail=result["error"])
     return JSONResponse(content={"message": f"Welcome {result['username']}!"}, status_code=200)
+
+
+
+
+@router.get("/sp500-realtime")
+def get_sp500_realtime(interval: str = Query("1m", description="Time interval: 1m, 2m, 5m, 15m, 1h, 1d, etc.")):
+    get_market_data(market="sp500", period='1d')

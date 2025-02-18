@@ -1,9 +1,10 @@
-from src.database.db_operations import *
+from src.database.stocks import *
 from src.technical.calculateIndicators import *
 from src.technical.fetchData import *
 from src.technical.graph import *
 from src.sentiment.fetch_data import *
 from src.sentiment.sentimental_analysis import *
+from src.front.front import *
 
 
 def function(ticker: str):
@@ -27,3 +28,7 @@ def get_sentiments(ticker:str):
     articles_df = articles_df.sort_values('publishedAt', ascending=False)
     articles_df = analyze_sentiment_vader(articles_df)
     return articles_df
+
+
+def get_market_data(market: str, period: str = "1d"):
+    get_market_data_fn(market, period)

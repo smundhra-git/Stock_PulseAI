@@ -13,7 +13,7 @@ from snscrape.modules.twitter import *
 import praw
 import certifi
 import datetime
-from src.database.db_operations import *
+from src.database.sentiment import *
 import requests
 from datetime import datetime
 from dateutil.parser import parse  # Requires the python-dateutil package

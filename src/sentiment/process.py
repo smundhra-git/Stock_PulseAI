@@ -1,5 +1,5 @@
 from src.sentiment.fetch_data import *
-from src.database.db_operations import *
+from src.database.sentiment import *
 import re
 from nltk.corpus import stopwords
 import string

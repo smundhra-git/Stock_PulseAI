@@ -1,0 +1,39 @@
+/* Sidebar - Fixed Left & Full Height */
+.sidebar {
+    position: fixed; /* Fix sidebar to the screen */
+    top: 0;
+    left: 0;
+    width: 4rem; /* Adjust as needed */
+    height: 100vh; /* Full height of the screen */
+    background-color: white;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 0;
+    gap: 2rem;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Ensure it stays above other elements */
+}
+
+/* Sidebar Icons */
+.sidebar-icon {
+    padding: 0.5rem;
+    color: #4b5563;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem; /* Adjust size */
+}
+
+.sidebar-icon:hover {
+    color: #111827;
+}
+
+/* Push Main Content Right */
+.main-content {
+    margin-left: 4rem; /* Adjust based on sidebar width */
+    padding: 20px;
+    flex-grow: 1;
+}

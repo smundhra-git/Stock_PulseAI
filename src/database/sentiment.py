@@ -1,187 +1,5 @@
-from dotenv import load_dotenv
-import os
-import psycopg2
-from psycopg2 import sql
-import pandas as pd
-from datetime import datetime
-import datetime
-from sqlalchemy import Column, Integer, String, create_engine
-from sqlalchemy.ext.declarative import declarative_base
-import jwt as pyjwt
-from passlib.context import CryptContext
-from fastapi import HTTPException
-from datetime import datetime, timedelta
+from src.database.base import *
 
-
-#load dotenv
-load_dotenv()
-
-# Database connection parameters
-DB_CONFIG = {
-    "dbname": os.getenv("DB_NAME"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
-    "host": os.getenv("DB_HOST"),
-    "port": os.getenv("DB_PORT"),
-}
-
-def get_db_connection():
-    """Establishes and returns a PostgreSQL database connection."""
-    return psycopg2.connect(**DB_CONFIG)
-
-
-# JWT Secret Key and Algorithm
-SECRET_KEY = "your_secret_key"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-def create_access_token(data: dict, expires_delta: timedelta):
-    """Generates a JWT access token with an expiration time."""
-    to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})
-    return pyjwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-
-def signup_user(username: str, password: str):
-    """Registers a new user in the database."""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Check if user already exists
-    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-    existing_user = cursor.fetchone()
-    if existing_user:
-        cursor.close()
-        conn.close()
-        return {"error": "Username already exists"}
-
-    # Hash password and insert into database
-    hashed_password = pwd_context.hash(password)
-    cursor.execute(
-        "INSERT INTO users (username, password) VALUES (%s, %s)",
-        (username, hashed_password),
-    )
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return {"message": "User created successfully"}
-
-
-def authenticate_user(username: str, password: str):
-    """Validates user credentials and returns a JWT token if successful."""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Fetch user from database
-    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-    user = cursor.fetchone()
-    cursor.close()
-    conn.close()
-
-    if not user:
-        return {"error": "Invalid username or password"}
-
-    user_id, db_username, db_password = user  # Unpacking user data
-
-    # Verify password
-    if not pwd_context.verify(password, db_password):
-        return {"error": "Invalid username or password"}
-
-    # Generate JWT token
-    access_token = create_access_token(
-        data={"sub": db_username}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
-
-    return {"access_token": access_token, "token_type": "bearer"}
-
-
-def verify_token(token: str):
-    """Verifies a JWT token and extracts the username."""
-    try:
-        payload = pyjwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return {"username": payload["sub"]}
-    except pyjwt.ExpiredSignatureError:
-        return {"error": "Token expired"}
-    except pyjwt.InvalidTokenError:
-        return {"error": "Invalid token"}
-
-
-def get_last_date(ticker: str):
-    """
-    Returns the latest date available in the table for the given ticker.
-    If no data exists, returns None.
-    """
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    query = sql.SQL("SELECT MAX(date) FROM {}").format(sql.Identifier(ticker.lower()))
-    cursor.execute(query)
-    result = cursor.fetchone()[0]
-    cursor.close()
-    conn.close()
-    return result
-
-#create stock table, this will be the schema
-def create_stock_table(ticker: str):
-    """Creates a stock-specific table with all required technical indicators if it doesn't exist."""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    query = sql.SQL("""
-        CREATE TABLE IF NOT EXISTS {} (
-            date DATE PRIMARY KEY,
-            open FLOAT,
-            high FLOAT,
-            low FLOAT,
-            close FLOAT,
-            volume BIGINT
-        );
-    """).format(sql.Identifier(ticker.lower()))
-    cursor.execute(query)
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-#delete stock data
-def delete_stock_table(ticker: str):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    query = sql.SQL("DROP TABLE {ticker}").format(sql.Identifier(ticker.lower()))
-    cursor.execute(query)
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-
-def get_latest_stock_data(ticker: str, window: int):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    query = sql.SQL("""
-        SELECT date, open, high, low, close, volume
-        FROM {} 
-        ORDER BY date DESC 
-        LIMIT %s;
-    """).format(sql.Identifier(ticker.lower()))
-
-    cursor.execute(query, (window,))
-    rows = cursor.fetchall()
-    conn.close()
-
-    df = pd.DataFrame(rows, columns=["date", "open", "high", "low", "close", "volume"])
-
-    # ✅ Ensure all columns are lowercase and have no spaces
-    df.columns = df.columns.str.strip().str.lower()
-
-    return df.sort_values(by="date")
-
-#############################################
-# News Data Table Functions
-#############################################
 
 def create_news_table():
     """Creates the news_data table if it doesn't exist."""
@@ -202,6 +20,7 @@ def create_news_table():
     conn.commit()
     cursor.close()
     conn.close()
+
 
 def insert_news_data(ticker: str, news_articles: list):
     """
@@ -234,6 +53,7 @@ def insert_news_data(ticker: str, news_articles: list):
     cursor.close()
     conn.close()
 
+
 def get_last_news_date(ticker: str):
     """
     Returns the latest published_at date for the given ticker from the news_data table.
@@ -247,6 +67,7 @@ def get_last_news_date(ticker: str):
     cursor.close()
     conn.close()
     return result
+
 
 #############################################
 # Tweets Data Table Functions
@@ -269,6 +90,7 @@ def create_tweets_table():
     conn.commit()
     cursor.close()
     conn.close()
+
 
 def insert_tweets_data(ticker: str, tweets: list):
     """
@@ -306,6 +128,8 @@ def get_last_tweets_date(ticker: str):
     cursor.close()
     conn.close()
     return result
+
+
 
 #############################################
 # Reddit Data Table Functions
@@ -370,9 +194,7 @@ def get_last_reddit_date(ticker: str):
     conn.close()
     return result
 
-#############################################
-# Optional: Retrieve Latest Data as DataFrames
-#############################################
+
 
 def get_latest_news_data(ticker: str, window: int = 100):
     conn = get_db_connection()

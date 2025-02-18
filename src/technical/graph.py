@@ -1,6 +1,6 @@
 import plotly.express as px
 import plotly.graph_objects as go
-from src.database.db_operations import get_latest_stock_data
+from src.database.stocks import get_latest_stock_data
 import pandas as pd
 
 # Mapping from custom period string to number of days (assumed trading days)
