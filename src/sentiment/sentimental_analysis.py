@@ -74,9 +74,3 @@ def analyze_sentiment_vader_reddit(articles: pd.DataFrame) -> pd.DataFrame:
     articles['sentiment_class'] = articles['compound'].apply(classify_sentiment)
     return articles
 
-def main():
-    query = input("Enter a financial topic (e.g., Tesla, Fed, etc.): ")
-    return sentiment(query)
-
-if __name__ == '__main__':
-    main()
