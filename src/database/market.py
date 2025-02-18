@@ -38,48 +38,51 @@ def get_last_market_date(market: str):
     return result
 
 
-
-
 def get_market_data(market: str, period: str = "1d"):
     """
-    Fetches the latest market data for an index like S&P 500.
-    If data is missing or outdated, fetches from Yahoo Finance and updates the database.
+    Fetches market data for the specified index (e.g., S&P 500), ensures the table exists,
+    updates data if needed, and returns a graph.
+
+    Args:
+        market (str): Market index name (e.g., "sp500").
     """
-    last_date = get_last_market_date(market)
-
-    # If data exists and is up to date, return from DB
-    if last_date and last_date >= datetime.utcnow().date() - timedelta(days=1):
-        conn = get_db_connection()
-        df = pd.read_sql(
-            sql.SQL("SELECT * FROM {} ORDER BY date DESC LIMIT 100").format(sql.Identifier(market.lower())),
-            conn
-        )
-        conn.close()
-        return df.to_dict(orient="records")
-
-    # Otherwise, fetch fresh data from Yahoo Finance
-    ticker = "^GSPC" if market.lower() == "sp500" else market.upper()
-    data = yf.Ticker(ticker).history(period=period)
-
-    if data.empty:
-        return {"error": "No data found for the given period."}
-
     conn = get_db_connection()
     cursor = conn.cursor()
+    query = sql.SQL("""
+        SELECT date, open, high, low, close, volume
+        FROM {} 
+        ORDER BY date DESC 
+        LIMIT %s;
+    """).format(sql.Identifier(market.lower()))
 
-    for index, row in data.iterrows():
-        cursor.execute(
-            sql.SQL("""
-                INSERT INTO {} (date, open, high, low, close, volume, last_updated)
-                VALUES (%s, %s, %s, %s, %s, %s, NOW())
-                ON CONFLICT (date) DO NOTHING;
-            """).format(sql.Identifier(market.lower())),
-            (index.date(), row["Open"], row["High"], row["Low"], row["Close"], row["Volume"])
-        )
-
-    conn.commit()
-    cursor.close()
+    cursor.execute(query, (period,))
+    rows = cursor.fetchall()
     conn.close()
 
-    return get_market_data(market, period)  # Return updated data
+    df = pd.DataFrame(rows, columns=["date", "open", "high", "low", "close", "volume"])
+    df.columns = df.columns.str.strip().str.lower()
+    return df.sort_values(by="date")
 
+
+def get_latest_market_data(market: str, window: int):
+    """
+    Retrieves the latest market data from the database.
+    
+    Args:
+        market (str): Market index name (e.g., "sp500")
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = sql.SQL("""
+        SELECT date, open, high, low, close, volume
+        FROM {}
+        ORDER BY date DESC
+        LIMIT %s;
+    """).format(sql.Identifier(market.lower()))
+    cursor.execute(query, (window,))
+    rows = cursor.fetchall()
+    conn.close()
+
+    df = pd.DataFrame(rows, columns=["date", "open", "high", "low", "close", "volume"])
+    df.columns = df.columns.str.strip().str.lower()
+    return df.sort_values(by="date")

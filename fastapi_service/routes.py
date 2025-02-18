@@ -108,4 +108,5 @@ async def protected_route(token: str):
 
 @router.get("/sp500-realtime")
 def get_sp500_realtime(interval: str = Query("1m", description="Time interval: 1m, 2m, 5m, 15m, 1h, 1d, etc.")):
-    get_market_data(market="sp500", period='1d')
+    result = get_market_data(market="^GSPC", period='1d')
+    return JSONResponse(content=result)

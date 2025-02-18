@@ -9,7 +9,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import requests
-from snscrape.modules.twitter import *
+# from snscrape.modules.twitter import *
 import praw
 import certifi
 import datetime

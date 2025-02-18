@@ -5,6 +5,7 @@ from src.technical.graph import *
 from src.sentiment.fetch_data import *
 from src.sentiment.sentimental_analysis import *
 from src.front.front import *
+from src.database.market import *
 
 
 def function(ticker: str):
@@ -31,4 +32,13 @@ def get_sentiments(ticker:str):
 
 
 def get_market_data(market: str, period: str = "1d"):
-    get_market_data_fn(market, period)
+    """
+    Get market data with proper error handling
+    """
+    create_market_table(market)
+    fetch_market_data(market, period)  # This fetches and stores in DB
+    return get_market_data_fn(market, period)  # This retrieves from DB and creates graph
+
+
+if __name__ == "__main__":
+    print(get_market_data("^GSPC", "1w"))
