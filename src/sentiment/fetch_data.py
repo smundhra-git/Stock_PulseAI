@@ -17,7 +17,8 @@ from src.database.sentiment import *
 import requests
 from datetime import datetime
 from dateutil.parser import parse  # Requires the python-dateutil package
-
+import pandas as pd
+import json
 # Load environment variables from .env
 load_dotenv()
 
@@ -125,43 +126,3 @@ def fetch_reddit_posts(query, count=50, from_date=None):
     except Exception as e:
         print("Error fetching Reddit posts:", e)
         return []
-
-
-def main():
-    ticker = input("Enter a ticker (e.g., TSLA, AAPL, etc.): ").strip()
-    
-    # Ensure that the necessary tables exist.
-    create_news_table()
-    create_reddit_table()
-    
-    # Retrieve the last fetch dates from the database for incremental fetching.
-    last_news_date = get_last_news_date(ticker)
-    last_reddit_date = get_last_reddit_date(ticker)
-    
-    news_articles = fetch_financial_news(ticker, from_date=last_news_date)
-    insert_news_data(ticker, news_articles)
-    """
-    To Work with twitter later
-    """
-    #     create_tweets_table()
-    # last_tweets_date = get_last_tweets_date(ticker)
-    # print("\nFetching Tweets...")
-    # tweets = fetch_tweets(ticker, from_date=last_tweets_date)
-    # print(f"Fetched {len(tweets)} tweets for {ticker}.")
-    # for tweet in tweets:
-    #     print("Date:", tweet.get('date'))
-    #     print("Content:", tweet.get('content'))
-    #     print("-" * 40)
-    # insert_tweets_data(ticker, tweets)
-    
-    reddit_posts = fetch_reddit_posts(ticker, from_date=last_reddit_date)
-    insert_reddit_data(ticker, reddit_posts)
-
-
-
-
-"""
-Next Idea -> Fetch Data
--> Store them in the database
--> Analysis will get data from database directly?
-"""
