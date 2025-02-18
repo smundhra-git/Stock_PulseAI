@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
 import "./Front.css";
+import Plot from 'react-plotly.js';
+
+const PERIOD_OPTIONS = ["1w", "1month", "3months", "6months", "1y", "5y", "max"];
 
 function Front() {
   const [marketData, setMarketData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [period, setPeriod] = useState("1y"); // Default period
 
   useEffect(() => {
     const fetchMarketOverview = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/sp500-realtime"); // ✅ Replace with your API URL
+        const response = await fetch(`http://localhost:8000/api/sp500-realtime?interval=${period}`);
         const data = await response.json();
         
         if (!response.ok) throw new Error(data.detail || "Failed to fetch market data");
@@ -23,11 +27,20 @@ function Front() {
     };
 
     fetchMarketOverview();
-  }, []);
+  }, [period]);
 
   return (
     <div className="market-overview">
       <h1>Market Overview</h1>
+
+      <div className="period-selector">
+        <label htmlFor="period">Select Period: </label>
+        <select id="period" value={period} onChange={(e) => setPeriod(e.target.value)}>
+          {PERIOD_OPTIONS.map(option => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+      </div>
 
       {loading ? (
         <p>Loading market data...</p>
@@ -35,45 +48,12 @@ function Front() {
         <p className="error">{error}</p>
       ) : marketData ? (
         <div className="market-content">
-          {/* ✅ Display S&P 500 Current Price */}
-          <div className="market-section">
-            <h2>S&P 500</h2>
-            <p>Current Price: ${marketData.sp500?.current_price ?? "N/A"}</p>
-            <p>Change: {marketData.sp500?.change} ({marketData.sp500?.percent_change}%)</p>
-          </div>
-
-          {/* ✅ Upcoming Earnings */}
-          <div className="market-section">
-            <h2>Upcoming Earnings</h2>
-            <ul>
-              {marketData.earnings?.length > 0 ? (
-                marketData.earnings.map((earn, index) => (
-                  <li key={index}>
-                    {earn.company} - {earn.date} ({earn.estimate})
-                  </li>
-                ))
-              ) : (
-                <p>No upcoming earnings</p>
-              )}
-            </ul>
-          </div>
-
-          {/* ✅ Top Gainers & Losers */}
-          <div className="market-section">
-            <h2>Top Gainers</h2>
-            <ul>
-              {marketData.top_gainers?.map((stock, index) => (
-                <li key={index}>{stock.ticker} - {stock.price} ({stock.change}%)</li>
-              ))}
-            </ul>
-
-            <h2>Top Losers</h2>
-            <ul>
-              {marketData.top_losers?.map((stock, index) => (
-                <li key={index}>{stock.ticker} - {stock.price} ({stock.change}%)</li>
-              ))}
-            </ul>
-          </div>
+          <Plot
+            data={marketData.data}
+            layout={marketData.layout}
+            config={{ responsive: true }}
+            style={{ width: "100%", height: "500px" }}
+          />
         </div>
       ) : (
         <p>No market data available.</p>

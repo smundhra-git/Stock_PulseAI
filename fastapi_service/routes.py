@@ -107,6 +107,9 @@ async def protected_route(token: str):
 
 
 @router.get("/sp500-realtime")
-def get_sp500_realtime(interval: str = Query("1m", description="Time interval: 1m, 2m, 5m, 15m, 1h, 1d, etc.")):
-    result = get_market_data(market="^GSPC", period='1d')
+def get_sp500_realtime(interval: str = Query("1y", description="Time period: 1w, 1month, 3months, 6months, 1y, 5y, or max")):
+    result = get_market_data(market="^GSPC", period=interval)
+    # Convert Plotly figure to JSON before returning
+    if hasattr(result, 'to_json'):
+        result = json.loads(result.to_json())
     return JSONResponse(content=result)

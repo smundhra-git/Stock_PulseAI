@@ -39,6 +39,3 @@ def get_market_data(market: str, period: str = "1d"):
     fetch_market_data(market, period)  # This fetches and stores in DB
     return get_market_data_fn(market, period)  # This retrieves from DB and creates graph
 
-
-if __name__ == "__main__":
-    print(get_market_data("^GSPC", "1w"))
