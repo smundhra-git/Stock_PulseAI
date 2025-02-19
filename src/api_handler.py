@@ -6,6 +6,7 @@ from src.sentiment.fetch_data import *
 from src.sentiment.sentimental_analysis import *
 from src.front.front import *
 from src.database.market import *
+from src.sentiment.sentiment import main as get_sentiment
 
 
 def function(ticker: str):
@@ -38,4 +39,35 @@ def get_market_data(market: str, period: str = "1d"):
     create_market_table(market)
     fetch_market_data(market, period)  # This fetches and stores in DB
     return get_market_data_fn(market, period)  # This retrieves from DB and creates graph
+
+def get_sentiment_score(ticker: str) -> dict:
+    """
+    Get sentiment scores for a given stock ticker.
+    
+    Args:
+        ticker (str): Stock ticker symbol (e.g., "AAPL")
+    Returns:
+        dict: Dictionary containing sentiment scores
+    """
+    try:
+        sentiment_scores = get_sentiment(ticker)
+        if sentiment_scores is None:
+            return {
+                "error": "Failed to get sentiment scores",
+                "ticker": ticker
+            }
+            
+        return {
+            "ticker": ticker,
+            "news_sentiment": round(sentiment_scores['news_sentiment_score'], 2),
+            "reddit_sentiment": round(sentiment_scores['reddit_sentiment_score'], 2),
+            "sec_sentiment": round(sentiment_scores['sec_sentiment_score'], 2),
+            "overall_sentiment": round(sentiment_scores['sentiment_score'], 2)
+        }
+        
+    except Exception as e:
+        return {
+            "error": str(e),
+            "ticker": ticker
+        }
 

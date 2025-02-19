@@ -96,16 +96,21 @@ def sec_sentiment(query: str) -> float:
 
 
 
-def main():
-    query = input("Enter a financial topic (e.g., Tesla, Fed, etc.): ")
+def main(query:str):
     #Equal weightage for all sentiment scores
     news_sentiment_score = news_sentiment(query)
     reddit_sentiment_score = reddit_sentiment(query)
     sec_sentiment_score = sec_sentiment(query)
 
     sentiment_score = (news_sentiment_score + reddit_sentiment_score + sec_sentiment_score) / 3
-    print(f"Final Sentiment Score: {sentiment_score}")
+    return {
+        'news_sentiment_score': news_sentiment_score,
+        'reddit_sentiment_score': reddit_sentiment_score,
+        'sec_sentiment_score': sec_sentiment_score,
+        'sentiment_score': sentiment_score
+    }
+
 
 if __name__ == '__main__':
-    main()
-
+    #run main function
+    main("AAPL")

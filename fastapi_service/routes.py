@@ -6,6 +6,7 @@ from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from src.database.auth import signup_user, verify_token, authenticate_user
 import yfinance as yf
+from src.api_handler import get_sentiment_score
 
 
 router = APIRouter()
@@ -113,3 +114,27 @@ def get_sp500_realtime(interval: str = Query("1y", description="Time period: 1w,
     if hasattr(result, 'to_json'):
         result = json.loads(result.to_json())
     return JSONResponse(content=result)
+
+
+# Write a route to get the sentiment score of a given ticker
+@router.get("/stock/{ticker}/sentiment")
+async def get_stock_sentiment(ticker: str):
+    """
+    Get sentiment analysis scores for a given stock ticker.
+    
+    Args:
+        ticker (str): Stock ticker symbol (e.g., "AAPL")
+    Returns:
+        JSONResponse: Sentiment scores or error message
+    """
+    try:
+        result = get_sentiment_score(ticker)
+        return JSONResponse(content=result)
+    except Exception as e:
+        return JSONResponse(
+            content={"error": str(e), "ticker": ticker},
+            status_code=500
+        )
+
+
+

@@ -5,6 +5,7 @@ import Header from './components/Header'
 import Login from './components/Login'
 import Sidebar from './components/Sidebar'
 import Front from './components/Front'
+import StockAnalysis from './components/StockAnalysis'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -19,26 +20,31 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-        <Route
-          path="/dashboard"
-          element={
-            isAuthenticated ? (
-              <div className="dashboard-container">
-                <Sidebar /> {/* Sidebar now separate from main content */}
-                <div className="content">
-                  <Header />
-                  <Front />
+      <div className="App">
+        <Header />
+        <Routes>
+          <Route path="/" element={<div className="home-content">Welcome to StockPulse AI</div>} />
+          <Route path="/stock/:ticker" element={<StockAnalysis />} />
+          <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+          <Route
+            path="/dashboard"
+            element={
+              isAuthenticated ? (
+                <div className="dashboard-container">
+                  <Sidebar /> {/* Sidebar now separate from main content */}
+                  <div className="content">
+                    <Header />
+                    <Front />
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
-      </Routes>
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+        </Routes>
+      </div>
     </Router>
   )
 }
