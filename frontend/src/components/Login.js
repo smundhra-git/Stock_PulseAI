@@ -49,9 +49,14 @@ function Login({ setIsAuthenticated }) {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("Account created! Redirecting...");
+        setMessage("Account created successfully!");
+        // Clear the form
+        setUsername("");
+        setPassword("");
+        // Switch to login after 2 seconds
         setTimeout(() => {
-          setIsSignup(false); // ✅ Switch back to login after signup
+          setIsSignup(false);
+          setMessage(""); // Clear the success message
         }, 2000);
       } else {
         setMessage(data.detail || "Signup failed");
@@ -154,12 +159,12 @@ function Login({ setIsAuthenticated }) {
 
         {/* Switch Between Login & Signup */}
         <div className="switch-container">
-        <p>
-          {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
+          <span>
+            {isSignup ? "Already have an account?" : "Don't have an account?"}
+          </span>
           <button className="switch-link" onClick={() => setIsSignup(!isSignup)}>
             {isSignup ? "Log in" : "Sign up"}
           </button>
-        </p>
         </div>
       </div>
     </div>

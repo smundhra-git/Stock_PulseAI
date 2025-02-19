@@ -7,6 +7,10 @@ from pydantic import BaseModel
 from src.database.auth import signup_user, verify_token, authenticate_user
 import yfinance as yf
 from src.api_handler import get_sentiment_score
+from datetime import datetime, timedelta
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 
 
 router = APIRouter()
@@ -15,20 +19,16 @@ router = APIRouter()
 @router.get("/stock/{ticker}/technical")
 async def get_stock_signal(ticker: str):
     """
-    API endpoint to fetch stock data and return buy/sell/hold recommendation.
+    Get technical analysis for a stock
     """
     try:
-        # Calculate score and recommendation
-        signal, final_score = function(ticker)
-
-        return {
-            "ticker": ticker,
-            "recommendation": signal,
-            "score": final_score
-        }
-
+        result = function(ticker)
+        return JSONResponse(content=result)
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch technical data: {str(e)}"
+        )
 
 @router.get("/stock/{ticker}/graph")
 async def get_stock_line_graph(ticker: str, period: str = Query("1y", description="Time period: 1w, 1month, 3months, 6months, 1y, 5y, or max")):
@@ -109,12 +109,19 @@ async def protected_route(token: str):
 
 @router.get("/sp500-realtime")
 def get_sp500_realtime(interval: str = Query("1y", description="Time period: 1w, 1month, 3months, 6months, 1y, 5y, or max")):
+    print(f"Fetching S&P 500 data for interval: {interval}")  # Debug log
     result = get_market_data(market="^GSPC", period=interval)
-    # Convert Plotly figure to JSON before returning
     if hasattr(result, 'to_json'):
         result = json.loads(result.to_json())
     return JSONResponse(content=result)
 
+@router.get("/nasdaq100-realtime")
+def get_nasdaq100_realtime(interval: str = Query("1y", description="Time period: 1w, 1month, 3months, 6months, 1y, 5y, or max")):
+    print(f"Fetching Nasdaq 100 data for interval: {interval}")  # Debug log
+    result = get_market_data(market="^NDX", period=interval)
+    if hasattr(result, 'to_json'):
+        result = json.loads(result.to_json())
+    return JSONResponse(content=result)
 
 # Write a route to get the sentiment score of a given ticker
 @router.get("/stock/{ticker}/sentiment")
@@ -136,5 +143,31 @@ async def get_stock_sentiment(ticker: str):
             status_code=500
         )
 
+ 
+@router.get("/front/news")
+async def get_market_news_route():
+    """
+    Fetches latest market news from News API.
+    Returns a list of news items with title, url, and time.
+    """
+    try:
+        # Correct function call (removed recursion)
+        news_items = get_market_news()  
 
+        if not news_items:  # If empty list, return an empty response
+            return []
 
+        # Format data for frontend
+        formatted_news = [{
+            "title": item["title"],
+            "url": item["url"],
+            "time": item["publishedAt"]
+        } for item in news_items]
+
+        return formatted_news
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch news: {str(e)}"
+        )

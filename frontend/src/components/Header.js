@@ -1,47 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Header.css";
-import { Search, Folder, HelpCircle, Settings, User } from "lucide-react";
+import { Search, HelpCircle, Settings, User } from "lucide-react";
 
-function Header() {
+function Header({ onLogout, searchInputRef }) {
   const [searchTicker, setSearchTicker] = useState("");
   const navigate = useNavigate();
-  
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTicker.trim()) {
       navigate(`/stock/${searchTicker.toUpperCase()}`);
-      setSearchTicker(""); // Clear the search input
+      setSearchTicker("");
     }
   };
-  
-  return (
-    <div className="header">
-      <div className="logo" onClick={() => navigate('/')}>
-        <img src="/logo.png" alt="StockAnal Logo" className="logo-img" />
-      </div>
 
-      <div className="search-container">
-        <form onSubmit={handleSearch} className="search-wrapper">
-          <Search className="search-icon" />
-          <input 
-            type="search" 
-            className="search-input" 
-            placeholder="Enter stock ticker (e.g., AAPL)..." 
-            value={searchTicker}
-            onChange={(e) => setSearchTicker(e.target.value.toUpperCase())}
-          />
-        </form>
-      </div>
-      
-      <div className="nav-icons">
-        <Folder className="nav-icon" />
-        <HelpCircle className="nav-icon" />
-        <Settings className="nav-icon" />
-        <div className="user-avatar">
-          <User className="user-icon" />
+  return (
+    <div className="header-wrapper">
+      <div className="header">
+        <div className="logo-section">
+          <img src="/logo_withbg.png" alt="StockPulse Logo" className="header-logo" />
         </div>
-      </div>   
+
+        <div className="search-section">
+          <form onSubmit={handleSearch} className="search-form">
+            <div className="search-input-wrapper">
+              <Search size={22} className="search-icon" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search ticker (e.g., AAPL)"
+                value={searchTicker}
+                onChange={(e) => setSearchTicker(e.target.value.toUpperCase())}
+                className="search-input"
+              />
+            </div>
+          </form>
+        </div>
+
+        <div className="actions-section">
+          <button className="action-button" title="FAQ">
+            <HelpCircle size={26} />
+          </button>
+          <button className="action-button" title="Settings">
+            <Settings size={26} />
+          </button>
+          <div className="user-profile" onClick={() => navigate('/profile')}>
+            <div className="avatar">
+              <User size={24} />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -7,6 +7,13 @@ from src.sentiment.sentimental_analysis import *
 from src.front.front import *
 from src.database.market import *
 from src.sentiment.sentiment import main as get_sentiment
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+news_api_key = os.getenv("NEWSAPI")
+
 
 
 def function(ticker: str):
@@ -71,3 +78,44 @@ def get_sentiment_score(ticker: str) -> dict:
             "ticker": ticker
         }
 
+def get_market_news(amount: int = 5) -> list:
+    """
+    Fetch market news using News API.
+    
+    Args:
+        amount (int): Number of news articles to return
+    Returns:
+        list: List of news articles
+    """
+    url = "https://newsapi.org/v2/top-headlines"
+    
+    params = {
+        "category": "business",
+        "language": "en",
+        "apiKey": news_api_key
+    }
+    
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        
+        data = response.json()
+        articles = data.get('articles', [])
+        
+        news_articles = [{
+            'title': article['title'],
+            'url': article['url'],
+            'publishedAt': article.get('publishedAt', 'Recent')
+        } for article in articles]
+        
+        # Sort by published date
+        news_articles.sort(
+            key=lambda x: x['publishedAt'] if x['publishedAt'] != 'Recent' else '',
+            reverse=True
+        )
+        
+        return news_articles[:amount]
+        
+    except Exception as e:
+        print(f"Error fetching news: {str(e)}")
+        return []

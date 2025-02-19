@@ -127,4 +127,3 @@ def get_market_data_fn(market: str, period: str = "1mo"):
     )
 
     return fig
-
