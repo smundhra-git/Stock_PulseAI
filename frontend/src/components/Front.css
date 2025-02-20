@@ -52,7 +52,7 @@
 }
 
 .widgets-section {
-  flex: 0 0 30%;
+  flex: 0 0 28%;
   display: flex;
   flex-direction: column;
   gap: 24px;

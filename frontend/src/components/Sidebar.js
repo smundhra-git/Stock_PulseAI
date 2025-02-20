@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 
 function Sidebar({ searchInputRef }) {
+  console.log("Sidebar is rendering...");
   const navigate = useNavigate();
   const location = useLocation();
   const [isExpanded, setIsExpanded] = useState(false);

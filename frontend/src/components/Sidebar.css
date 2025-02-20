@@ -14,6 +14,7 @@
     z-index: 1000; /* Ensure it stays above other elements */
     transition: width 0.3s ease;
     color: white;
+    text-align: left;
 }
 
 .sidebar.collapsed {
