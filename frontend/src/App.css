@@ -1,3 +1,11 @@
+:root{
+  --primary-blue: #0a192f;
+  --light-blue: #172a46;
+  --hover-blue: #1e3a5f;
+  --text-light: #94a3b8;
+  --border-color: #e2e8f0;
+}
+
 .App {
   text-align: center;
   background-color: #f8f8f8;
