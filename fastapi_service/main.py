@@ -8,6 +8,7 @@ app = FastAPI(title="Stock Analysis API", version="1.0")
 origins = [
     "http://localhost:3000",  # React frontend
     "http://localhost:5173", #Vite frontend
+    "*" # Allow all origins
 ]
 
 # Enable CORS Middleware

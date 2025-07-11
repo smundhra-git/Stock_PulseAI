@@ -215,6 +215,7 @@ def analyze_sentiment_finbert_news(articles: pd.DataFrame):
     global finbert_pipeline
     if finbert_pipeline is None:
         initialize_finbert()
+    
     if finbert_pipeline:
         try:
             results = []
@@ -250,8 +251,12 @@ def analyze_sentiment_finbert_news(articles: pd.DataFrame):
 
             return articles
         except Exception as e:
+            # If there's an error during processing, fallback to default scores
+            articles['sentiment_score'] = 50.0  # Neutral sentiment
             return articles
     else:
+        # FinBERT pipeline failed to load, add default neutral sentiment scores
+        articles['sentiment_score'] = 50.0  # Neutral sentiment score (0-100 scale)
         return articles
 
 

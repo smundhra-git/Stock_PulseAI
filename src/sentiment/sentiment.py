@@ -102,6 +102,14 @@ def main(query:str):
     reddit_sentiment_score = reddit_sentiment(query)
     sec_sentiment_score = sec_sentiment(query)
 
+    # Handle None values by using neutral score (50.0)
+    if news_sentiment_score is None:
+        news_sentiment_score = 50.0
+    if reddit_sentiment_score is None:
+        reddit_sentiment_score = 50.0
+    if sec_sentiment_score is None:
+        sec_sentiment_score = 50.0
+
     sentiment_score = (news_sentiment_score + reddit_sentiment_score + sec_sentiment_score) / 3
     return {
         'news_sentiment_score': news_sentiment_score,
