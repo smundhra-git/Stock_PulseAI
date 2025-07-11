@@ -1,1 +1,0 @@
-#Celery Tasks (fetching stock data)
